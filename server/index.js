@@ -17,6 +17,7 @@ app.use(
 app.use(bodyParser.json());
 
 mdb.connect("mongodb+srv://btwiamsankar:sansankarg2004@travel.olwg8cv.mongodb.net/userDatabase");
+// mdb.connect("mongodb://localhost:27016/");
 
 var db = mdb.connection;
 db.once("open", () => {
