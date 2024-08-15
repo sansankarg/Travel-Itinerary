@@ -2,6 +2,8 @@ const mongoose = require('mongoose');
 
 const itinerarySchema = new mongoose.Schema({
     username : String,
+    no : Number,
+    date : String,
     day: Number,
     places: [
         {

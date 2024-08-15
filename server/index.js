@@ -29,7 +29,7 @@ app.get("/", (req, res) => {
 });
 
 app.post('/save-itinerary', async (req, res) => {
-    const { data, username } = req.body;
+    const { data, username, no, date } = req.body;
     console.log("Itinerary recieved");
     const deleteResult = await Itinerary.deleteMany({ username: username});
     if (deleteResult.deletedCount > 0) {
@@ -40,8 +40,10 @@ app.post('/save-itinerary', async (req, res) => {
     const itineraryEntries = Object.keys(data).map( day => {
         return {
             username : username,
+            no : no,
+            date : date,
             day: day.replace('day', ''),
-            places: data[day]
+            places: data[day].places
         };
     });
     console.log(itineraryEntries);
@@ -61,11 +63,18 @@ app.post("/login", async (request, response) => {
         const { name, password } = request.body;
         console.log("Data is receiving from front end:", request.body);
         let user = await User.findOne({ name: name });
+        let itinerary = await Itinerary.findOne({ username: name });
+        var k = "no";
+        console.log(itinerary);
+        if(itinerary) {
+            k = "yes";
+        }
+        console.log(k);
         console.log("Data retrieved from backend :", user);
         if (user) {
             if (user.password === password) {
                 console.log("Login Successful");
-                return response.json({ message: "Login success", name: user.name});
+                return response.json({ message: "Login success", name: user.name, k : k});
             } else {
                 console.log("Incorrect password");
                 return response.json({ message: "Invalid password" });
@@ -76,7 +85,7 @@ app.post("/login", async (request, response) => {
         } 
     } catch (error) {
         console.error("Error during login:", error);
-        return response.json({ message: "Login unsuccessful", username : user.name });
+        return response.json({ message: "Login unsuccessful", username : user.name, k : k });
     }
 });
 app.post("/plan-page", async (request, response) => {
@@ -95,10 +104,12 @@ app.post("/plan-page", async (request, response) => {
             "8" :   await Itinerary.findOne({username : username, day : 8}),
             "9" :   await Itinerary.findOne({username : username, day : 9}),
         }
-        let data = await Itinerary.findOne({username : username, day : 4});
-        console.log("Sample data sent : ", data);
-        
-        return response.json({ message: "data sent", dataset : final });
+        let data = await Itinerary.findOne({username : username});
+        var start = data.date;
+        console.log("Sample data sent : ", final);
+        console.log("Start date : ",data.no);
+        console.log("Total no. of days :",start);
+        return response.json({ message: "data sent", dataset : final, no : data.no, date : start});
     
     } catch (error) {
         console.error("Error during login:", error);
